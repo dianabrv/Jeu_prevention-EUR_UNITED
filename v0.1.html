@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jeu Interactif - Brouillon</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; background-color: #f0f0f0; margin: 0; padding: 20px; }
+        h1 { color: #333; }
+        p { color: #666; }
+
+        #conteneur-jeu { position: relative; display: inline-block; }
+        #image-fond { max-width: 100%; height: auto; border: 5px solid #ddd; border-radius: 10px; }
+
+        /* Style de la bulle de texte */
+        .bulle-texte {
+            position: absolute;
+            background-color: white;
+            border: 2px solid black;
+            border-radius: 20px;
+            padding: 10px 15px;
+            font-size: 16px;
+            top: 10%; right: 25%; /* Coordonnées de la bulle */
+            width: 180px;
+            z-index: 10;
+        }
+        /* Triangle de la bulle */
+        .bulle-texte::after {
+            content: '';
+            position: absolute;
+            bottom: -15px; left: 20px;
+            border-width: 15px 15px 0 0;
+            border-style: solid;
+            border-color: white transparent transparent transparent;
+            z-index: 9;
+        }
+
+        /* Conteneur pour les options cliquables */
+        .conteneur-options {
+            position: absolute;
+            top: 35%; left: 15%; /* Position générale du bloc à gauche */
+            width: 25%;
+            z-index: 5;
+            display: flex; flex-direction: column; gap: 20px;
+        }
+
+        /* Style commun pour les boutons de choix (carrés) */
+        .zone-option {
+            background-color: white;
+            border: 2px solid #555;
+            border-radius: 10px;
+            padding: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s; /* Petit effet au survol */
+        }
+        .zone-option:hover { transform: scale(1.05); border-color: black; }
+        #option-a { color: #007bff; } /* Bleu */
+        #option-b { color: #28a745; } /* Vert */
+
+    </style>
+</head>
+<body onload="demarrerJeu()"> <h1>Brouillon</h1>
+    <p>Vous êtes le médecin en charge de poser un diagnostic :</p>
+
+    <div id="conteneur-jeu">
+        <img src="image_fond.jpg" id="image-fond" alt="Patient adulte à l'hôpital">
+	
+	<button onclick="window.location.reload()" style="position: absolute; bottom: 15px; right: 15px; padding: 10px; cursor: pointer;">
+    Relancer
+	</button>
+
+        <div id="bulle-texte" class="bulle-texte">
+            Bonjour !<br>
+            J'ai mal à la tête et j'ai de la fièvre depuis 2 jours.
+        </div>
+
+        <div id="conteneur-options" class="conteneur-options" style="display: none;">
+            <div id="option-a" class="zone-option" onclick="choixA()">Avez-vous voyager récemment ?</div>
+            <div id="option-b" class="zone-option" onclick="choixB()">Faites-vous du sport ?</div>
+        </div>
+    </div>
+	<div id="consigne" style="display: none; font-size: 20px; font-weight: bold; color: #333; margin-bottom: 15px;">
+    Quel diagnostic donnez-vous au patient ?
+	</div>
+
+    <script>
+	// Déclaration de mes variables 0 = Zika et 1 = non
+   	let maladie = Math.round(Math.random());
+
+   	// Test : affiche la maladie dans la console du navigateur (F12)
+   	console.log("Le patient a cette maladie : " + maladie);
+
+        // Fonction principale qui gère le scénario
+        function demarrerJeu() {
+            // Après 7000 millisecondes (3 secondes)
+            setTimeout(function() {
+                // Masquer la bulle de texte
+                document.getElementById('bulle-texte').style.display = 'none';
+                // Afficher le conteneur d'options
+                document.getElementById('conteneur-options').style.display = 'flex';
+            }, 2500);
+        }
+
+	function etapeSuivante() {
+    		let bulle = document.getElementById('bulle-texte');
+    
+   		// On cache les options et on montre la bulle de réponse
+   		bulle.style.display = 'block';
+   		document.getElementById('conteneur-options').style.display = 'none';
+	
+   		// Après 3 secondes, on prépare la suite
+   		setTimeout(function() {
+    	    		bulle.style.display = 'none';
+			document.getElementById('consigne').style.display = 'block';
+        
+        		let optA = document.getElementById('option-a');
+       			let optB = document.getElementById('option-b');
+        
+        		optA.innerHTML = "West Nile";
+        		optB.innerHTML = "Autre";
+        
+        		// On envoie 0 pour west nile et 1 pour autre
+        		optA.setAttribute("onclick", "verifierDiagnostic(0)");
+        		optB.setAttribute("onclick", "verifierDiagnostic(1)");
+        		// On réaffiche les boutons mis à jour
+        		document.getElementById('conteneur-options').style.display = 'flex';
+   	 	}, 2500);	
+        }
+        // Fonctions pour les clics sur les choix
+        function choixA() {
+	    if (maladie == 0) {
+            // 1. On récupère la bulle et on change son texte
+        let bulle = document.getElementById('bulle-texte');
+        bulle.innerHTML = "Oui, j'étais en vacances à la Réunion la semaine dernière";
+        
+        // 2. On affiche la bulle
+        bulle.style.display = 'block';
+
+        // 3. On cache les options pour que l'utilisateur ne puisse plus cliquer dessus
+        document.getElementById('conteneur-options').style.display = 'none';
+   		}
+	    else {
+	    // 1. On récupère la bulle et on change son texte
+        let bulle = document.getElementById('bulle-texte');
+        bulle.innerHTML = "Non, je n'ai pas bougé de Toulouse dernièrement";
+        
+        // 2. On affiche la bulle
+        bulle.style.display = 'block';
+
+        // 3. On cache les options pour que l'utilisateur ne puisse plus cliquer dessus
+        document.getElementById('conteneur-options').style.display = 'none';
+   		}
+	   etapeSuivante();
+	}
+        function choixB() {
+        	let bulle = document.getElementById('bulle-texte');
+        	bulle.innerHTML = "Oui, très souvent";
+        	bulle.style.display = 'block';
+        	document.getElementById('conteneur-options').style.display = 'none';
+		etapeSuivante();
+        }
+
+	function verifierDiagnostic(reponseDuJoueur) {
+    	if (reponseDuJoueur == maladie && maladie == 0) {
+       	 alert("Oui, le patient a bien le West Nile !");
+   	 } else if (reponseDuJoueur == maladie && maladie == 1) {
+    	    alert("Oui, le patient a bien une autre maladie !");
+  	  } else if (reponseDuJoueur != maladie && maladie == 0) {
+    	    alert("Non, le patient a bien le West Nile.");
+  	  } else {
+    	    alert("Non, le patient a une autre maladie.");
+   	 }
+  	  window.location.reload(); 
+	}
+    </script>
+
+</body>
+</html>
